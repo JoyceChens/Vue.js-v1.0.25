@@ -114,10 +114,19 @@ button:hover,button:focus{
 }
 
 .form-group{
+	margin:10px;
+}
+
+.form-group>label{
 	display:inline-block;
-	padding:right:1rem;
+	padding-right:1rem;
 	width:5rem;
 	text-align:right;
+}
+
+.form-group>input,.form-group>select{
+	display:inline-block;
+	line-height:1.8rem;
 }
 
 .form-group>input,.form-group>select{
