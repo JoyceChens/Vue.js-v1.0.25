@@ -55,7 +55,7 @@ input: {
 input[type=text]{
 	padding:3px 6px;
 	font-size:1.2px;
-	border:1px solid $ccc;
+	border:1px solid #ccc;
 }
 
 input[typt=text]:focus{
