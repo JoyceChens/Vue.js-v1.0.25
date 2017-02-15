@@ -35,7 +35,10 @@
 					</tr>
 				</tbody>
 			</table>
-			<dialog-template :mode="mode" :fields='columns' :title="title" :item="item"></dialog-template>
+			<div class="container">
+				<button class="btn" @click="openNewItemDialog('Create new item')">Create</button>
+			</div>
+			<dialog-template :mode="mode" :fields='columns' :title="title" :item="item" @create-item="createItem"></dialog-template>
 		</template>
 		
 		<template id="dialogTemplate">
@@ -45,6 +48,13 @@
 						<header class="dialog-header">
 							<h1 class="dialog-title">{{title}}</h1>
 						</header>
+						<div class="form-group" v-for="field in fields">
+							<label>{{field.name}}</label>
+							<select v-if="field.dataSource" v-model="item[field.name]">
+								<option v-for="opt in field.dataSource" value="opt">{{opt}}</option>
+							</select>
+							<input type="text" v-else v-model="item[field.name]"/>
+						</div>
 						<footer class="dialog-footer">
 							<div class="form-group">
 								<label></label>
@@ -73,6 +83,27 @@
 				methods:{
 					deleteItem:function(index){
 						this.dataList.splice(index,1)
+					},
+					openNewItemDialog:function(title){
+						//对话框的标题
+						this.title = title
+						//mode=1表示新建模式
+						this.mode=1
+						//初始化this.item
+						this.item={}
+						//广播事件，showDialog是dialog-template组件的一个方法，传入参数true表示显示对话框
+						this.$broadcast('showDialog',true)
+					},
+					createItem:function(){
+						//将item追加到dataList中
+						this.dataList.push(this.item)
+						//广播事件，传入参数false表示隐藏对话框
+						this.$broadcast('showDialog',false)
+						//数据传输完后，重置item对象
+						this.item={}
+					},
+					deleteItem:function(index){
+						this.dataList.splice(index,1)
 					}
 				},
 				components:{
@@ -96,7 +127,17 @@
 			            		this.show = false
 			            	},
 			            	save:function(){
-			            		
+			            		//新建模式
+			            		if(this.mode === 1){
+			            			//使用$dispatch调用simple-grid的create-item方法
+			            			this.$dispatch('create-item')
+			            		}
+			            	}
+			            },
+			            events:{
+			            	//显示/隐藏对话框
+			            	'showDialog':function(show){
+			            		this.show = show
 			            	}
 			            }
 					}
@@ -109,13 +150,15 @@
 					searchQuery:'',
 					columns:[
 						{
-							name:'name'
+							name:'name',
+							isKey:true
 						},
 						{
 							name:'age'
 						},
 						{
-							name:'sex'
+							name:'sex',
+							dataSource:['Male','Female']
 						}
 					],
 					people:[
